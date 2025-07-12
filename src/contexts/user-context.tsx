@@ -1,4 +1,4 @@
-"use client";
+"use client"; // ✅ Required
 
 import { authClient } from "@/app/lib/auth/client";
 import { logger } from "@/app/lib/default-logger";
@@ -68,10 +68,8 @@ export function UserProvider({
   React.useEffect(() => {
     checkSession().catch((err: unknown) => {
       logger.error(err);
-      // noop
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
-  }, []);
+  }, [checkSession]);
 
   return (
     <UserContext.Provider value={{ ...state, checkSession }}>
@@ -79,5 +77,3 @@ export function UserProvider({
     </UserContext.Provider>
   );
 }
-
-export const UserConsumer = UserContext.Consumer;

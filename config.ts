@@ -1,3 +1,4 @@
+import { getSiteURL } from "@/app/lib/get-site-url";
 import { LogLevel } from "@/app/lib/logger";
 
 export interface Config {
@@ -16,6 +17,3 @@ export const config: Config = {
     (process.env.NEXT_PUBLIC_LOG_LEVEL as keyof typeof LogLevel) ??
     LogLevel.ALL,
 };
-function getSiteURL(): string {
-  throw new Error("Function not implemented.");
-}

@@ -1,15 +1,24 @@
 "use client";
 
 import {
+  Avatar,
   Box,
-  Container,
-  TextField,
-  MenuItem,
   Button,
+  Container,
+  IconButton,
+  Menu,
+  MenuItem,
+  TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 import Link from "next/link";
+import { useState, useContext } from "react";
+import { UserContext } from "@/contexts/user-context"; // ✅ adjust path
+import { authClient } from "./lib/auth/client";
+import router from "next/router";
+import React from "react";
+import { logger } from "./lib/default-logger";
+
 const mockQuestions = [
   {
     id: 1,
@@ -34,6 +43,33 @@ const mockQuestions = [
 export default function Home() {
   const [filter, setFilter] = useState("newest");
 
+  const { user, isLoading } = useContext(UserContext) ?? {
+    user: null,
+    isLoading: true,
+  };
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => setAnchorEl(null);
+
+  const handleSignOut = React.useCallback(async (): Promise<void> => {
+    try {
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        logger.error("Sign out error", error);
+        return;
+      }
+
+      // UserProvider, for this case, will not refresh the router and we need to do it manually
+      // After refresh, AuthGuard will handle the redirect
+    } catch (err) {
+      logger.error("Sign out error", err);
+    }
+  }, [router]);
   return (
     <>
       {/* Header */}
@@ -48,17 +84,42 @@ export default function Home() {
         borderBottom="1px solid #ddd"
       >
         <Typography variant="h6">StackIt</Typography>
+
+        {/* Right corner */}
         <Box>
-          <Link href="/auth/login" passHref>
-            <Button variant="outlined">Login</Button>
-          </Link>
-          <Link href="/auth/register" passHref>
-            <Button variant="outlined">Register</Button>
-          </Link>
+          {isLoading ? null : user ? (
+            <>
+              <IconButton onClick={handleAvatarClick}>
+                <Avatar sx={{ bgcolor: "#1976d2" }}>
+                  {user.username?.charAt(0)?.toUpperCase()}
+                </Avatar>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+              >
+                <MenuItem disabled>{user.username}</MenuItem>
+                <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" passHref>
+                <Button variant="text" sx={{ mr: 1 }}>
+                  Login
+                </Button>
+              </Link>
+              <Link href="/auth/register" passHref>
+                <Button variant="outlined">Register</Button>
+              </Link>
+            </>
+          )}
         </Box>
       </Box>
 
-      {/* Main content */}
+      {/* Main Content */}
       <Container maxWidth="md" sx={{ mt: 4 }}>
         {/* Filters + Search */}
         <Box display="flex" alignItems="center" gap={2} flexWrap="wrap" mb={3}>
