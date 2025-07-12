@@ -8,6 +8,7 @@ import {
   FormHelperText,
   InputLabel,
   OutlinedInput,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
@@ -17,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import React from "react";
 import { authClient } from "@/app/lib/auth/client";
+import Link from "next/link";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -63,43 +65,68 @@ export default function LoginPage() {
   );
 
   return (
-    <Box maxWidth="sm" mx="auto" mt={8}>
-      <Typography variant="h4" gutterBottom>
-        Login
-      </Typography>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
-          <Controller
-            control={control}
-            name="username"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.username)}>
-                <InputLabel>Username</InputLabel>
-                <OutlinedInput {...field} label="Username" type="username" />
-                <FormHelperText>{errors.username?.message}</FormHelperText>
-              </FormControl>
-            )}
-          />
+    <Box
+      minHeight="100vh"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      sx={{ backgroundColor: "#f0f2f5", p: 2 }}
+    >
+      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 480 }}>
+        <Stack spacing={3}>
+          <Box textAlign="center">
+            <Typography variant="h4" fontWeight="bold">
+              Welcome Back!
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Login to your account
+            </Typography>
+          </Box>
 
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.password)}>
-                <InputLabel>Password</InputLabel>
-                <OutlinedInput {...field} label="Password" type="password" />
-                <FormHelperText>{errors.password?.message}</FormHelperText>
-              </FormControl>
-            )}
-          />
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Stack spacing={2}>
+              <Controller
+                control={control}
+                name="username"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.username)} fullWidth>
+                    <InputLabel>Username</InputLabel>
+                    <OutlinedInput {...field} label="Username" />
+                    <FormHelperText>{errors.username?.message}</FormHelperText>
+                  </FormControl>
+                )}
+              />
 
-          {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.password)} fullWidth>
+                    <InputLabel>Password</InputLabel>
+                    <OutlinedInput {...field} label="Password" type="password" />
+                    <FormHelperText>{errors.password?.message}</FormHelperText>
+                  </FormControl>
+                )}
+              />
 
-          <Button type="submit" variant="contained">
-            Login
-          </Button>
+              {errors.root && <Alert severity="error">{errors.root.message}</Alert>}
+
+              <Button fullWidth variant="contained" type="submit" disabled={isPending}>
+                Login
+              </Button>
+            </Stack>
+          </form>
+
+          <Box textAlign="center">
+            <Typography variant="body2" color="text.secondary">
+              Don't have an account?{" "}
+              <Link href="/auth/register" style={{ fontWeight: "medium", color: "#1976d2" }}>
+                Register
+              </Link>
+            </Typography>
+          </Box>
         </Stack>
-      </form>
+      </Paper>
     </Box>
   );
 }

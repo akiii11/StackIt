@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect, useCallback, useRef } from "react";
 import { UserContext } from "@/contexts/user-context";
 import { authClient } from "./lib/auth/client";
 import router from "next/navigation";
@@ -56,10 +56,14 @@ export default function Home() {
         logger.error("Sign out error", error);
         return;
       }
+
+      // Clear user state and reload the page
+      setAnchorEl(null);
+      window.location.reload();
     } catch (err) {
       logger.error("Sign out error", err);
     }
-  }, [router]);
+  }, []);
 
   type Notification = {
     id: string;
@@ -260,9 +264,6 @@ export default function Home() {
                 <Button variant="text" sx={{ mr: 1 }}>
                   Login
                 </Button>
-              </Link>
-              <Link href="/auth/register" passHref>
-                <Button variant="outlined">Register</Button>
               </Link>
             </>
           )}
