@@ -322,7 +322,7 @@ export default function Home() {
               ))}
             </Box>
             <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-              Asked by: <strong>{q.authorId}</strong>
+              Asked by: <strong>{q.author.username}</strong>
             </Typography>
             {q.answers.length > 0 && (
               <Box>
