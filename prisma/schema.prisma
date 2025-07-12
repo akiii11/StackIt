@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  email         String         @unique
+  password      String
+  role          Role           @default(USER)
+  questions     Question[]
+  answers       Answer[]
+  votes         Vote[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+}
+
+model Question {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  tags        QuestionTag[]
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id])
+  answers     Answer[]
+  createdAt   DateTime      @default(now())
+}
+
+model Tag {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  questions QuestionTag[]
+}
+
+model QuestionTag {
+  id         String   @id @default(cuid())
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      String
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  content    String
+  isAccepted Boolean  @default(false)
+  questionId String
+  authorId   String
+  question   Question @relation(fields: [questionId], references: [id])
+  author     User     @relation(fields: [authorId], references: [id])
+  votes      Vote[]
+  createdAt  DateTime @default(now())
+}
+
+model Vote {
+  id       String @id @default(cuid())
+  userId   String
+  answerId String
+  value    Int // +1 or -1
+  user     User   @relation(fields: [userId], references: [id])
+  answer   Answer @relation(fields: [answerId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
