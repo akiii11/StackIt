@@ -1,103 +1,116 @@
-import Image from "next/image";
+"use client";
+
+import {
+  Box,
+  Container,
+  TextField,
+  MenuItem,
+  Button,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
+import Link from "next/link";
+const mockQuestions = [
+  {
+    id: 1,
+    title: "How to join 2 columns in SQL?",
+    description:
+      "I want to join column A and B to create a new one but I don’t know SQL well...",
+    tags: ["SQL", "Beginner"],
+    votes: 4,
+    author: "User123",
+  },
+  {
+    id: 2,
+    title: "How to implement JWT in Next.js?",
+    description:
+      "I'm trying to add JWT-based auth in my app but struggling with token refresh...",
+    tags: ["Next.js", "JWT", "Auth"],
+    votes: 7,
+    author: "DevDoe",
+  },
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [filter, setFilter] = useState("newest");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  return (
+    <>
+      {/* Header */}
+      <Box
+        component="header"
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={4}
+        py={2}
+        bgcolor="#f9f9f9"
+        borderBottom="1px solid #ddd"
+      >
+        <Typography variant="h6">StackIt</Typography>
+        <Box>
+          <Link href="/auth/login" passHref>
+            <Button variant="outlined">Login</Button>
+          </Link>
+          <Link href="/auth/register" passHref>
+            <Button variant="outlined">Register</Button>
+          </Link>
+        </Box>
+      </Box>
+
+      {/* Main content */}
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        {/* Filters + Search */}
+        <Box display="flex" alignItems="center" gap={2} flexWrap="wrap" mb={3}>
+          <TextField placeholder="Search..." fullWidth />
+          <TextField
+            select
+            label="Filter"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            size="small"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="unanswered">Unanswered</MenuItem>
+            <MenuItem value="popular">Popular</MenuItem>
+          </TextField>
+          <Button variant="contained">Ask New Question</Button>
+        </Box>
+
+        {/* Question List */}
+        {mockQuestions.map((q) => (
+          <Box
+            key={q.id}
+            border="1px solid #ddd"
+            borderRadius="10px"
+            p={2}
+            mb={2}
+            bgcolor="#fff"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <Typography variant="h6">{q.title}</Typography>
+            <Typography variant="body2" sx={{ mb: 1 }} color="text.secondary">
+              {q.description}
+            </Typography>
+            <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
+              {q.tags.map((tag) => (
+                <Box
+                  key={tag}
+                  px={1.5}
+                  py={0.5}
+                  bgcolor="#e0e0e0"
+                  borderRadius="5px"
+                  fontSize="12px"
+                >
+                  {tag}
+                </Box>
+              ))}
+            </Box>
+            <Typography variant="caption">
+              {q.votes} votes • asked by {q.author}
+            </Typography>
+          </Box>
+        ))}
+      </Container>
+    </>
   );
 }

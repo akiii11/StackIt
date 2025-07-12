@@ -10,3 +10,8 @@ export class Constants {
   static readonly SECRET_JWT_KEY = "stackit";
   static readonly baseURL = process.env.NEXT_PUBLIC_SERVER_URL + "/api/";
 }
+
+export enum ApiNames {
+  Login = "auth/login",
+  Signup = "auth/register",
+}
