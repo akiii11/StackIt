@@ -133,7 +133,6 @@ export async function GET(request: NextRequest) {
           answers: {
             include: {
               author: { select: { id: true, username: true } },
-              votes: true,
             },
           },
         },

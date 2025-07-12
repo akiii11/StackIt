@@ -21,7 +21,6 @@ model User {
   role          Role           @default(USER)
   questions     Question[]
   answers       Answer[]
-  votes         Vote[]
   notifications Notification[]
   createdAt     DateTime       @default(now())
 }
@@ -59,17 +58,8 @@ model Answer {
   authorId   String
   question   Question @relation(fields: [questionId], references: [id])
   author     User     @relation(fields: [authorId], references: [id])
-  votes      Vote[]
+  voteCount  Int      @default(0)
   createdAt  DateTime @default(now())
-}
-
-model Vote {
-  id       String @id @default(cuid())
-  userId   String
-  answerId String
-  value    Int // +1 or -1
-  user     User   @relation(fields: [userId], references: [id])
-  answer   Answer @relation(fields: [answerId], references: [id])
 }
 
 model Notification {
@@ -77,7 +67,7 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   message   String
-  link      String // Added link field for notification
+  link      String
   createdAt DateTime @default(now())
 }
 

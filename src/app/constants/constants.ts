@@ -17,4 +17,5 @@ export enum ApiNames {
   Questions = "questions",
   Answers = "answers",
   Notifications = "notifications",
+  Votes = "votes",
 }

@@ -161,6 +161,41 @@ export default function Home() {
     }
   };
 
+  const handleVote = async (answerId: string, voteType: 1 | -1) => {
+    if (!user) {
+      router.redirect("/auth/login");
+    }
+
+    try {
+      const response = await postData(ApiNames.Votes, {
+        answerId,
+        vote: voteType,
+      });
+
+      if (response.code === ServerCodes.Success) {
+        setQuestions((prevQuestions) =>
+          prevQuestions.map((q) => {
+            if (q.id === currentQuestionId) {
+              return {
+                ...q,
+                answers: q.answers.map((a) =>
+                  a.id === answerId
+                    ? { ...a, voteCount: a.voteCount + voteType }
+                    : a
+                ),
+              };
+            }
+            return q;
+          })
+        );
+      } else {
+        logger.error("Failed to submit vote", response.message);
+      }
+    } catch (error) {
+      logger.error("Error submitting vote", error);
+    }
+  };
+
   return (
     <>
       {/* Header */}
@@ -194,12 +229,7 @@ export default function Home() {
                       <Typography variant="body2">
                         {notification.message}
                       </Typography>
-                      <Button
-                        variant="text"
-                        onClick={() => {
-                          // Handle accepting the answer
-                        }}
-                      >
+                      <Button variant="text" onClick={() => {}}>
                         Accept Answer
                       </Button>
                     </MenuItem>
@@ -313,6 +343,25 @@ export default function Home() {
                     <Typography variant="caption" color="text.secondary">
                       Answered by: <strong>{answer.authorId}</strong>
                     </Typography>
+                    <Box display="flex" alignItems="center" gap={1} mt={1}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleVote(answer.id, 1)}
+                      >
+                        Upvote
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleVote(answer.id, -1)}
+                      >
+                        Downvote
+                      </Button>
+                      <Typography variant="body2">
+                        Votes: {answer.voteCount}
+                      </Typography>
+                    </Box>
                   </Box>
                 ))}
               </Box>

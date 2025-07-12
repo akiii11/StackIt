@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `answer` ADD COLUMN `voteCount` INTEGER NOT NULL DEFAULT 0;

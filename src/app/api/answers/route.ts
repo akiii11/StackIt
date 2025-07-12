@@ -157,7 +157,6 @@ export async function GET(request: NextRequest) {
         author: {
           select: { id: true, username: true },
         },
-        votes: true,
       },
     });
 

@@ -12,6 +12,7 @@ export interface Answers {
   id: string; // Unique identifier for the answer
   content: string; // Content of the answer
   questionId: string; // ID of the question this answer belongs to
+  voteCount: number; // Number of votes the answer has received
   authorId: string; // ID of the user who authored the answer
   createdAt: Date; // Timestamp when the answer was created
 }
