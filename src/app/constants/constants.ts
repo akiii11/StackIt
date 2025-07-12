@@ -14,4 +14,7 @@ export class Constants {
 export enum ApiNames {
   Login = "auth/login",
   Signup = "auth/register",
+  Questions = "questions",
+  Answers = "answers",
+  Notifications = "notifications",
 }

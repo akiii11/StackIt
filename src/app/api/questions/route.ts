@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
+  console.log("Request body:", body); // Debugging
   const { error, value } = postValidation.validate(body);
   if (error) {
     response.code = ServerCodes.ValidationError;
@@ -63,6 +64,29 @@ export async function POST(request: NextRequest) {
   }
 
   const { title, description, tagIds } = value;
+
+  if (!Array.isArray(tagIds)) {
+    response.code = ServerCodes.ValidationError;
+    response.message = "Invalid tagIds format";
+    return NextResponse.json(response, { status: 400 });
+  }
+
+  // Validate that all tagIds exist in the database
+  const existingTags = await prisma.tag.findMany({
+    where: { id: { in: tagIds } },
+  });
+
+  const missingTags = tagIds.filter(
+    (tagId) => !existingTags.some((tag) => tag.id === tagId)
+  );
+
+  // Create missing tags
+  if (missingTags.length > 0) {
+    await prisma.tag.createMany({
+      data: missingTags.map((tagId) => ({ id: tagId, name: tagId })),
+      skipDuplicates: true,
+    });
+  }
 
   try {
     const newQuestion = await prisma.question.create({
@@ -86,8 +110,9 @@ export async function POST(request: NextRequest) {
     response.message = "Question created successfully";
     response.data = [newQuestion];
     return NextResponse.json(response, { status: 200 });
-  } catch {
+  } catch (error) {
     response.message = "Database error while creating question";
+    console.dir(error);
     return NextResponse.json(response, { status: 500 });
   }
 }
@@ -188,7 +213,9 @@ export async function PUT(request: NextRequest) {
 
   const { questionId, title, description } = value;
 
-  const existing = await prisma.question.findUnique({ where: { id: questionId } });
+  const existing = await prisma.question.findUnique({
+    where: { id: questionId },
+  });
   if (!existing) {
     response.code = ServerCodes.InvalidArgs;
     response.message = "Question not found";
@@ -254,7 +281,9 @@ export async function DELETE(request: NextRequest) {
 
   const { questionId } = value;
 
-  const existing = await prisma.question.findUnique({ where: { id: questionId } });
+  const existing = await prisma.question.findUnique({
+    where: { id: questionId },
+  });
   if (!existing) {
     response.code = ServerCodes.InvalidArgs;
     response.message = "Question not found";

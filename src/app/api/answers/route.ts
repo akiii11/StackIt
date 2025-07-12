@@ -9,7 +9,6 @@ import { JwtPayload } from "@/app/types/jwt-payload";
 const postValidation = Joi.object({
   content: Joi.string().min(1).required(),
   questionId: Joi.string().required(),
-  authorId: Joi.string().required(),
 });
 
 const putValidation = Joi.object({
@@ -51,9 +50,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response, { status: 500 });
   }
   try {
-    if (!userId) {
-      response.message = "Invalid User";
-    }
     const requestData = await request.json();
     const { error, value } = postValidation.validate(requestData);
     if (error) {
@@ -62,31 +58,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 400 });
     }
 
-    const { content, questionId, authorId } = value;
-    const questionExists = await prisma.question.findUnique({
+    const { content, questionId } = value;
+    const question = await prisma.question.findUnique({
       where: { id: questionId },
+      include: { author: true },
     });
 
-    if (!questionExists) {
+    if (!question) {
       response.code = ServerCodes.InvalidArgs;
       response.message = "Invalid question ID.";
       return NextResponse.json(response, { status: 404 });
     }
 
-    const userExists = await prisma.user.findUnique({
-      where: { id: authorId },
-    });
-
-    if (!userExists) {
-      response.code = ServerCodes.InvalidArgs;
-      response.message = "Invalid author ID.";
-      return NextResponse.json(response, { status: 404 });
-    }
     const newAnswer = await prisma.answer.create({
       data: {
         content,
         questionId,
-        authorId,
+        authorId: userId,
+      },
+    });
+
+    // Create notification for the question author
+    await prisma.notification.create({
+      data: {
+        userId: question.author.id,
+        message: `Your question has been answered by ${userId}.`,
+        link: `/questions/${questionId}`,
       },
     });
 
